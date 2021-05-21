@@ -3,7 +3,6 @@ package com.github.caioreigot.nybooks.data
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-
 // Singleton
 object ApiService {
 
@@ -14,6 +13,6 @@ object ApiService {
             .build()
     }
 
-    val service = initRetrofit().create(NYTServices::class.java)
+    val service: NYTServices = initRetrofit().create(NYTServices::class.java)
 
 }

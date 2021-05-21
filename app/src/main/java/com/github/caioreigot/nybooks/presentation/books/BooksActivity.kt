@@ -8,8 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.caioreigot.nybooks.R
+//import androidx.activity.viewModels
 
 class BooksActivity : AppCompatActivity() {
+
+    //private val viewModel: BooksViewModel by viewModels()
 
     lateinit var toolbarMain: Toolbar
     lateinit var recyclerViewBooks: RecyclerView
