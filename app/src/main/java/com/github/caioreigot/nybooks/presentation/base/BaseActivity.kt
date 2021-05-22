@@ -18,5 +18,4 @@ open class BaseActivity : AppCompatActivity() {
         if (showBackButton)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
 }

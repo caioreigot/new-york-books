@@ -40,5 +40,4 @@ class BookDetailsActivity : BaseActivity() {
         tv_book_details_title.text = intent.getStringExtra(EXTRA_TITLE)
         tv_book_details_description.text = intent.getStringExtra(EXTRA_DESCRIPTION)
     }
-
 }

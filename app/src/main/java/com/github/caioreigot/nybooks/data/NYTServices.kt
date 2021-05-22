@@ -12,5 +12,4 @@ interface NYTServices {
         @Query("api-key") apiKey: String = "bzwqRl7tMX1kNOA979gZrSvH87o9lYQ8",
         @Query("list") list: String = "hardcover-fiction"
     ): Call<BookBodyResponse>
-
 }

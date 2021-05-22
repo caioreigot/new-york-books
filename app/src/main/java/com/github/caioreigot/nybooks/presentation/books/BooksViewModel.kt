@@ -59,5 +59,4 @@ class BooksViewModel(val dataSource: BooksRepository) : ViewModel() {
             throw IllegalArgumentException("Unkown ViewModel class")
         }
     }
-
 }

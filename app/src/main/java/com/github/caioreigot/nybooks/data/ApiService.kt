@@ -14,5 +14,4 @@ object ApiService {
     }
 
     val service: NYTServices = initRetrofit().create(NYTServices::class.java)
-
 }
