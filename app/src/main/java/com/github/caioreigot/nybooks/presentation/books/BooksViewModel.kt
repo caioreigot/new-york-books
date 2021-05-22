@@ -2,12 +2,12 @@ package com.github.caioreigot.nybooks.presentation.books
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.caioreigot.nybooks.data.ApiService
+import androidx.lifecycle.ViewModelProvider
+import com.github.caioreigot.nybooks.R
+import com.github.caioreigot.nybooks.data.BooksResult
 import com.github.caioreigot.nybooks.data.model.Book
-import com.github.caioreigot.nybooks.data.response.BookBodyResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.github.caioreigot.nybooks.data.repository.BooksRepository
+import java.lang.IllegalArgumentException
 
 /*
  * Obs: não receber nenhuma referência de uma activity ou fragment no ViewModel
@@ -17,51 +17,47 @@ import retrofit2.Response
  * activity ou fragment após ela ser reconstruída
  */
 
-class BooksViewModel : ViewModel() {
+class BooksViewModel(val dataSource: BooksRepository) : ViewModel() {
 
     val booksLiveData: MutableLiveData<List<Book>> = MutableLiveData()
+    val viewFlipperLiveData: MutableLiveData<Pair<Int, Int?>> = MutableLiveData()
+
+    companion object {
+        private const val VIEW_FLIPPER_BOOKS = 1
+        private const val VIEW_FLIPPER_ERROR = 2
+    }
 
     fun getBooks() {
-        //booksLiveData.value = createFakeBooks()
+        // Passando o Callback para a interface
+        dataSource.getBooks { result: BooksResult ->
+            when (result) {
+                is BooksResult.Success -> {
+                    booksLiveData.value = result.books
+                    viewFlipperLiveData.value = Pair(VIEW_FLIPPER_BOOKS, null)
+                }
 
-        //Esta chamada à Api poderia estar na camada repository
-        ApiService.service.getBooks().enqueue(object: Callback<BookBodyResponse> {
-            override fun onResponse(
-                call: Call<BookBodyResponse>,
-                response: Response<BookBodyResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val books: MutableList<Book> = mutableListOf()
+                is BooksResult.ApiError -> {
+                    if (result.statusCode == 401)
+                        viewFlipperLiveData.value = Pair(BooksViewModel.VIEW_FLIPPER_ERROR, R.string.books_error_401)
+                    else
+                        viewFlipperLiveData.value = Pair(BooksViewModel.VIEW_FLIPPER_ERROR, R.string.books_error_400_generic)
+                }
 
-                    response.body()?.let { bookBodyResponse ->
-                        for (result in bookBodyResponse.bookResults) {
-                            val book = Book(
-                                title = result.bookDetails[0].title,
-                                author = result.bookDetails[0].author
-                            )
-
-                            books.add(book)
-                        }
-                    }
-
-                    booksLiveData.value = books
+                is BooksResult.ServerError -> {
+                    viewFlipperLiveData.value = Pair(BooksViewModel.VIEW_FLIPPER_ERROR, R.string.books_error_500_generic)
                 }
             }
-
-            override fun onFailure(call: Call<BookBodyResponse>, t: Throwable) {
-
-            }
-        })
+        }
     }
 
-    /*
-    fun createFakeBooks(): List<Book> {
-        return listOf(
-            Book("Title 1", "Author 1"),
-            Book("Title 2", "Author 2"),
-            Book("Title 3", "Author 3"),
-        )
+    @Suppress("UNCHECKED_CAST")
+    class ViewModelFactory(val dataSource: BooksRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(BooksViewModel::class.java))
+                return BooksViewModel(dataSource) as T
+
+            throw IllegalArgumentException("Unkown ViewModel class")
+        }
     }
-     */
 
 }

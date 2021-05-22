@@ -9,7 +9,8 @@ import com.github.caioreigot.nybooks.R
 import com.github.caioreigot.nybooks.data.model.Book
 
 class BooksAdapter(
-    private val books: List<Book>
+    private val books: List<Book>,
+    val onItemClickListener: (book: Book) -> Unit
 ) : RecyclerView.Adapter<BooksAdapter.BooksViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BooksViewHolder {
@@ -23,7 +24,7 @@ class BooksAdapter(
         holder.bindView(books[position])
     }
 
-    class BooksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class BooksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val title = itemView.findViewById<TextView>(R.id.textTitle)
         private val author = itemView.findViewById<TextView>(R.id.textAuthor)
@@ -31,6 +32,10 @@ class BooksAdapter(
         fun bindView(book: Book) {
             title.text = book.title
             author.text = book.author
+
+            itemView.setOnClickListener {
+                onItemClickListener.invoke(book)
+            }
         }
     }
 
